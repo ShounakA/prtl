@@ -1,6 +1,8 @@
 [package]
 name = "prtl"
 version = "0.1.0"
+license = "MIT"
+description = "Jump to tagged directories quickly with prtl."
 edition = "2021"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html

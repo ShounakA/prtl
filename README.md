@@ -10,7 +10,7 @@ TBD on where to find the install
 
 ## Usage
 
-- ```prtl --help``` -> Help command
+- ```prtl -h``` -> Help command
 - ```prtl set <path>``` -> Sets the given path (relative or full) as your default prtl
 - ```prtl set <path> -t <tag>``` -> Sets the given path to the given tag
 
