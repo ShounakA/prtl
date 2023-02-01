@@ -11,7 +11,7 @@ use serde_with::serde_as;
 
 
 const DEFAULT_PRTL_TAG: &str = "default_prtl";
-const CONFIG_APP_NAME: &str = ".prtl-123";
+const CONFIG_APP_NAME: &str = ".prtl";
 
 /// prtl arguments
 /// Usage: prtl <COMMAND>
