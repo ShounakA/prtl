@@ -2,7 +2,7 @@
 Small tool to keep track of your tagged directories. Portal to tagged locations quickly.
 
 ## Installation
-TBD on where to find the install
+- ```cargo install prtl```
 
 ## Build from Source
 - ```git clone https://github.com/ShounakA/prtl.git```
