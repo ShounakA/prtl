@@ -7,6 +7,7 @@ edition = "2021"
 
 [dependencies]
 clap = { version = "4.1.4", features = ["derive"] }
-confy = { version = "0.5.1", features = ["toml_conf"], default-features=false } 
+confy = { version = "0.5.1", features = ["yaml_conf"], default-features=false } 
 serde = "1.0.152"
 serde_derive = "1.0.152"
+serde_with = "2.2.0"

@@ -1,4 +1,5 @@
 use core::fmt;
+use std::collections::HashMap;
 use std::error::Error;
 use std::{fs, io};
 use std::path::PathBuf;
@@ -6,9 +7,11 @@ use std::io::Write as IoWrite;
 
 use clap::{Parser, arg, Subcommand};
 use serde_derive::{Deserialize, Serialize};
+use serde_with::serde_as;
 
 
-const DEFUALT_PRTL_TAG: &str = "default_prtl";
+const DEFAULT_PRTL_TAG: &str = "default_prtl";
+const CONFIG_APP_NAME: &str = ".prtl";
 
 /// Simple program to greet a person
 #[derive(Parser, Debug)]
@@ -26,27 +29,24 @@ enum Commands {
         path: String,
         
         /// give the directory a tag.
-        #[arg(short, default_value= DEFUALT_PRTL_TAG)]
+        #[arg(short, default_value= DEFAULT_PRTL_TAG)]
         tag: String,
     },
     
     Get {
         /// A tag representing a directory
-        #[arg(default_value= DEFUALT_PRTL_TAG)]
+        #[arg(default_value= DEFAULT_PRTL_TAG)]
         tag: String
     }
 }
 
+#[serde_as]
 #[derive(Debug, PartialEq, Serialize, Deserialize)]
 struct PortalConfig {
     prtl: String,
-    prtls: Vec<Portal>,
-}
 
-#[derive(Debug, PartialEq, Serialize, Deserialize)]
-struct Portal {
-   tag: String,
-   path: String,
+    #[serde_as(as = "Vec<(_, _)>")]
+    portal_map: HashMap<String, String>
 }
 
 #[derive(Debug)]
@@ -63,11 +63,11 @@ impl fmt::Display for PortalError {
 }
 
 impl ::std::default::Default for PortalConfig {
-   fn default() -> Self { Self { prtl: DEFUALT_PRTL_TAG.to_string(), prtls: Vec::<Portal>::new() } }
+   fn default() -> Self { Self { prtl: DEFAULT_PRTL_TAG.to_string(), portal_map: HashMap::new() } }
 }
 
 fn main() -> Result<(), PortalError> {
-   let mut cfg: PortalConfig = match confy::load(".prtl", None) {
+   let mut cfg: PortalConfig = match confy::load(CONFIG_APP_NAME, None) {
       Ok(config) => config,
       Err(_e) => return Err(PortalError { message: format!("Error loading config.") })
    };
@@ -77,33 +77,24 @@ fn main() -> Result<(), PortalError> {
 
    match &args.command {
       Some(Commands::Set { path, tag }) => {
-
          let srcdir = PathBuf::from(path);
          let canonical_dir = match fs::canonicalize(srcdir) {
             Ok((path)) => path.to_string_lossy().into_owned(),
             Err(_e) => return Err(PortalError { message: format!("Path {} is invalid.", &path) } ),
          };
-
-         match &cfg.prtls.iter().position(|p| p.tag == tag.to_string()) {
-            Some(portal_index) =>  {
-               let _ = &cfg.prtls.remove(*portal_index);
-            },
-            None => ()
-         };
-         cfg.prtls.insert(0, Portal { tag: (&tag).to_string(), path: canonical_dir });
+         cfg.portal_map.insert((&tag).to_string(), canonical_dir);
       },
       Some(Commands::Get { tag }) => {
-         let prtl = &cfg.prtls.iter().filter(|&p| p.tag == tag.to_string() ).collect::<Vec::<&Portal>>();
-         let prtl_path = match prtl.first() {
-            Some(first_prtl) => first_prtl.path.clone(),
-            None => "".to_string(),  
+         if let Some(value) = &cfg.portal_map.get(tag) {
+           writeln!(&mut stdout, "{}", value);
+         } else {
+               return Err(PortalError { message: format!("Did not find prtl with tag {}", tag)})
          };
-         writeln!(&mut stdout, "{}", prtl_path);
       },
       None => ()
    };
 
-   match confy::store(".prtl", None, cfg) {
+   match confy::store(CONFIG_APP_NAME, None, cfg) {
       Ok(()) => Ok({}),
       Err(_e) => Err(PortalError { message: "Failed to save config".to_string()} ),
    }
