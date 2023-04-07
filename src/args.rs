@@ -2,6 +2,8 @@ use clap::{Parser, arg, Subcommand};
 
 pub const DEFAULT_PRTL_TAG: &str = "default_prtl";
 pub const CONFIG_APP_NAME: &str = ".prtl";
+pub const SHELL_TAG_BASH: &str = "bash";
+
 
 /// prtl arguments
 /// Usage: prtl <COMMAND>
@@ -37,5 +39,11 @@ pub enum Commands {
         /// A tag representing a directory
         #[arg(default_value = DEFAULT_PRTL_TAG)]
         tag: String
-    }
+    },
+
+    EzInit {
+        /// A shell id to configure shorthand script
+        #[arg(default_value = SHELL_TAG_BASH)]
+        shell: String
+    },
 }

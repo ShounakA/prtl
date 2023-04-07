@@ -1,0 +1,24 @@
+name: Publish and Release
+
+on:
+  pull_request:
+    types:
+      - closed
+    branches: [ "main" ]
+    paths:
+      - 'src/**.rs'
+
+env:
+  CARGO_TERM_COLOR: always
+
+jobs:
+  build:
+    if-merged:
+      if: github.event.pull_request.merged == true
+      runs-on: ubuntu-latest
+      steps:
+      - uses: actions/checkout@v3
+      - name: Build
+        run: cargo build --verbose
+      - name: Run publish
+        run: cargo publish

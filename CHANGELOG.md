@@ -1,3 +1,8 @@
+# [0.2.0] - 2023-04-07
+
+## Added
+- shorthand comannds to jump to and set portals.
+- adds ez-init command to configure shorthand for your shell.
 
 # [0.1.1] - 2023-02-01
 
