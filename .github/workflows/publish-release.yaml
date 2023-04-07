@@ -6,7 +6,7 @@ on:
       - closed
     branches: [ "main" ]
     paths:
-      - 'src/**.rs'
+      - 'version.yaml'
 
 env:
   CARGO_TERM_COLOR: always
