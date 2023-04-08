@@ -3,7 +3,7 @@ pub const PRTL_SHORTHAND_SCRIPT: &str = r#"
 function p() {
    if [[ $1 = "get" ]]; then 
      cd $(prtl "$@")
-   elif [[ $1 = "set" ]]; then
+   elif [ $1 = "set" ] || [ $1 = "list" ]; then
      $(prtl $@)
    else
      echo Global options will not work. Type \'prtl -h\' for more info.

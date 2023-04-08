@@ -46,4 +46,9 @@ pub enum Commands {
         #[arg(default_value = SHELL_TAG_BASH)]
         shell: String
     },
+    List {
+        // Return list of prtls as json
+        #[arg(short, long, required = false)]
+        json: bool
+    }
 }

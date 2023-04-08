@@ -8,6 +8,8 @@ Small tool to keep track of your tagged directories. Portal to tagged locations 
 - ```git clone https://github.com/ShounakA/prtl.git```
 - ```cd prtl && cargo build --release```
 
+## Auto Configure Shorthand
+```prtl ez-init --shell bash```
 ## Manually Configure Shorthand
 
 ### Bash
@@ -16,7 +18,7 @@ Small tool to keep track of your tagged directories. Portal to tagged locations 
    function p() {
       if [[ $1 = "get" ]]; then 
          cd $(prtl "$@")
-      elif [[ $1 = "set" ]]; then
+      elif [ $1 = "set" ] || [ $1 = "list" ]; then
          $(prtl $@)
       else
          echo Global options will not work. Type \'prtl -h\' for more info.
