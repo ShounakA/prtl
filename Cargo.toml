@@ -11,7 +11,9 @@ edition = "2021"
 clap = { version = "4.1.4", features = ["derive"] }
 confy = { version = "0.5.1", features = ["yaml_conf"], default-features=false } 
 serde = "1.0.152"
+serde_json = "1.0.95"
 serde_derive = "1.0.152"
 serde_with = "2.2.0"
 rust_search = "2.0.0"
 dialoguer = "0.10.4"
+colored = "2.0.0"

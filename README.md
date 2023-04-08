@@ -8,6 +8,8 @@ Small tool to keep track of your tagged directories. Portal to tagged locations 
 - ```git clone https://github.com/ShounakA/prtl.git```
 - ```cd prtl && cargo build --release```
 
+## Auto Configure Shorthand
+```prtl ez-init --shell bash```
 ## Manually Configure Shorthand
 
 ### Bash

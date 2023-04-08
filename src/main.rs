@@ -9,6 +9,7 @@ use std::{fs};
 use std::path::PathBuf;
 use std::io::Write as IoWrite;
 use clap::Parser;
+use colored::Colorize;
 use dialoguer::{Select, Input};
 use dialoguer::console::Term;
 use dialoguer::theme::ColorfulTheme;
@@ -90,6 +91,24 @@ fn main() -> Result<(), PortalError> {
             _ => {
                writeln!(stdout, "Usupported shell. Please try and configure manually.").expect("Could not write to terminal. ¯\\_(ツ)_/¯");
             },
+         }
+      },
+      Commands::List { json } => {
+         if *json {
+            let m = serde_json::to_value(&cfg.portal_map).unwrap();
+            writeln!(stdout, "{}", m.to_string()).expect("¯\\_(ツ)_/¯");
+         } else {
+            writeln!(stdout, "{0: <12}🧿 {1} 🧿\n", "", "Your Portals".bold().green()).expect("¯\\_(ツ)_/¯");
+            for key in cfg.portal_map.keys() {
+               match cfg.portal_map.get(key) {
+                  Some(p) => {
+                     let row = format!("{0: <14}\t{1}\n", key.bold().blue(), p.italic().green());
+                     write!(stdout, "{0: <3} {1}","✨", row).expect("¯\\_(ツ)_/¯");
+                  },
+                  None => ()
+               };
+            }
+            writeln!(stdout, "\n{0: <14}🍻 {1} 🍻", "", "Cheers!".bold().green()).expect("¯\\_(ツ)_/¯");
          }
       }
    };
