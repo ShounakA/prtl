@@ -1,9 +1,8 @@
-use clap::{Parser, arg, Subcommand};
+use clap::{arg, Parser, Subcommand};
 
 pub const DEFAULT_PRTL_TAG: &str = "default_prtl";
 pub const CONFIG_APP_NAME: &str = ".prtl";
 pub const SHELL_TAG_BASH: &str = "bash";
-
 
 /// prtl arguments
 /// Usage: prtl <COMMAND>
@@ -25,30 +24,27 @@ pub struct PortalArgs {
 
 #[derive(Subcommand, Debug)]
 pub enum Commands {
-
     Set {
         /// path to set as last directory.
         path: String,
-        
+
         /// give the directory a tag.
         #[arg(short, default_value = DEFAULT_PRTL_TAG)]
         tag: String,
     },
-    
     Get {
         /// A tag representing a directory
         #[arg(default_value = DEFAULT_PRTL_TAG)]
-        tag: String
+        tag: String,
     },
-
     EzInit {
         /// A shell id to configure shorthand script
         #[arg(default_value = SHELL_TAG_BASH)]
-        shell: String
+        shell: String,
     },
     List {
         // Return list of prtls as json
         #[arg(short, long, required = false)]
-        json: bool
-    }
+        json: bool,
+    },
 }

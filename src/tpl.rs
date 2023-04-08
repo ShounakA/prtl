@@ -1,4 +1,3 @@
-
 pub const PRTL_SHORTHAND_SCRIPT: &str = r#"
 function p() {
    if [ $1 = "get" ]; then 
