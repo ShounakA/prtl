@@ -15,9 +15,9 @@ use std::io::Write as IoWrite;
 use std::path::PathBuf;
 
 use args::{Commands, PortalArgs, SHELL_TAG_BASH};
-use portal::{PortalConfig, PortalError};
+use portal::{Config, Error as PrtlError};
 
-use crate::tpl::PRTL_SHORTHAND_SCRIPT;
+use tpl::PRTL_SHORTHAND_SCRIPT;
 
 /// Usage: prtl <COMMAND>
 ///
@@ -29,8 +29,8 @@ use crate::tpl::PRTL_SHORTHAND_SCRIPT;
 /// Options:
 ///   -h, --help     Print help
 ///   -V, --version  Print version
-fn main() -> Result<(), PortalError> {
-    let mut cfg = match PortalConfig::load() {
+fn main() -> Result<(), PrtlError> {
+    let mut cfg = match Config::load() {
         Ok(config) => config,
         Err(err) => return Err(err),
     };
@@ -40,18 +40,16 @@ fn main() -> Result<(), PortalError> {
 
     match &args.command {
         Commands::Set { path, tag } => {
-            let srcdir = PathBuf::from(path);
-            let canonical_dir = match fs::canonicalize(srcdir) {
-                Ok(path) => path.to_string_lossy().to_string(),
-                Err(_e) => return Err(PortalError::new(format!("Path {} is invalid.", &path))),
+            match cfg.put(tag.to_owned(), path.to_owned()){
+                Ok(_) => (),
+                Err(err) => return Err(err),
             };
-            cfg.put(tag, canonical_dir);
         }
         Commands::Get { tag } => {
             if let Some(value) = cfg.get(tag) {
                 writeln!(&mut stdout, "{}", value).ok();
             } else {
-                return Err(PortalError::new(format!(
+                return Err(PrtlError::new(format!(
                     "Did not find prtl with tag {}",
                     tag
                 )));
@@ -73,11 +71,11 @@ fn main() -> Result<(), PortalError> {
             if *json {
                 match serde_json::to_value(&cfg.portal_map) {
                     Ok(m) => {
-                        writeln!(stdout, "{}", m.to_string()).unwrap();
+                        writeln!(stdout, "{}", m.to_owned()).unwrap();
                         ()
                     }
                     Err(_) => {
-                        return Err(PortalError::new(format!(
+                        return Err(PrtlError::new(format!(
                             "{}",
                             "Failed to deseriallize portal map to json"
                         )))
@@ -105,11 +103,10 @@ fn main() -> Result<(), PortalError> {
             }
         }
     };
-
     cfg.store()
 }
 
-fn setup_bash() -> Result<(), PortalError> {
+fn setup_bash() -> Result<(), PrtlError> {
     // Search for Bash Profile
     let search_input = ".bash";
     let mut search: Vec<String> = SearchBuilder::default()
@@ -147,7 +144,7 @@ fn setup_bash() -> Result<(), PortalError> {
             {
                 Ok(typed_text) => typed_text,
                 Err(_) => {
-                    return Err(PortalError::new(format!(
+                    return Err(PrtlError::new(format!(
                         "¯\\_(ツ)_/¯ Something went wrong with input"
                     )))
                 }
@@ -155,7 +152,7 @@ fn setup_bash() -> Result<(), PortalError> {
             let canonical_dir = match fs::canonicalize(&custom_file) {
                 Ok(path) => path.to_string_lossy().to_string(),
                 Err(_e) => {
-                    return Err(PortalError::new(format!(
+                    return Err(PrtlError::new(format!(
                         "Path {} is invalid.",
                         custom_file
                     )));
@@ -174,11 +171,11 @@ fn setup_bash() -> Result<(), PortalError> {
     let shorthand_path = path.to_string_lossy().to_string();
     match write_shorthand_file(&shorthand_path) {
         Ok(_) => (),
-        Err(_e) => return Err(PortalError::new(format!(""))),
+        Err(_e) => return Err(PrtlError::new(format!(""))),
     };
     return match write_to_profile(&file_to_write, shorthand_path){
       Ok(_) => Ok(()),
-      Err(_e) => Err(PortalError::new(format!("Failed to write to file. Try manual configuration: https://github.com/ShounakA/prtl#readme")))
+      Err(_e) => Err(PrtlError::new(format!("Failed to write to file. Try manual configuration: https://github.com/ShounakA/prtl#readme")))
    };
 }
 

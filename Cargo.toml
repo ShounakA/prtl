@@ -1,6 +1,6 @@
 [package]
 name = "prtl"
-version = "0.2.0"
+version = "0.2.0-alpha"
 license = "MIT"
 description = "Jump to tagged directories quickly with prtl."
 edition = "2021"
