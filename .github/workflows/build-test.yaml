@@ -19,11 +19,11 @@ jobs:
         profile: minimal
         toolchain: stable
         components: rustfmt, clippy
-    - name: Release build
+    - name: Run build
       uses: actions-rs/cargo@v1
       with:
         command: build
-    - name: Release build
+    - name: Run test
       uses: actions-rs/cargo@v1
       with:
         command: test
