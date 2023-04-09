@@ -1,7 +1,6 @@
 use clap::{arg, Parser, Subcommand};
 
 pub const DEFAULT_PRTL_TAG: &str = "default_prtl";
-pub const CONFIG_APP_NAME: &str = ".prtl";
 pub const SHELL_TAG_BASH: &str = "bash";
 
 /// prtl arguments
@@ -43,7 +42,7 @@ pub enum Commands {
         shell: String,
     },
     List {
-        // Return list of prtls as json
+        /// Return list of prtls as json
         #[arg(short, long, required = false)]
         json: bool,
     },

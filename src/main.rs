@@ -1,8 +1,7 @@
 mod args;
 mod portal;
-mod tpl;
 
-use clap::Parser;
+use clap::{Parser};
 use colored::Colorize;
 use dialoguer::console::Term;
 use dialoguer::theme::ColorfulTheme;
@@ -15,9 +14,8 @@ use std::io::Write as IoWrite;
 use std::path::PathBuf;
 
 use args::{Commands, PortalArgs, SHELL_TAG_BASH};
-use portal::{Config, Error as PrtlError};
+use portal::{Config, Error as PrtlError, PRTL_SHORTHAND_SCRIPT};
 
-use tpl::PRTL_SHORTHAND_SCRIPT;
 
 /// Usage: prtl <COMMAND>
 ///
@@ -34,7 +32,6 @@ fn main() -> Result<(), PrtlError> {
         Ok(config) => config,
         Err(err) => return Err(err),
     };
-
     let args = PortalArgs::parse();
     let mut stdout = &Term::stdout();
 
@@ -163,7 +160,6 @@ fn setup_bash() -> Result<(), PrtlError> {
         _ => selected_option.to_string(),
     };
 
-    //
     let mut path = PathBuf::from(&file_to_write);
     path.pop();
     path.push("prtl_shorthand.sh");

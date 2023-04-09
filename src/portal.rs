@@ -6,7 +6,22 @@ use std::path::PathBuf;
 use serde_derive::{Deserialize, Serialize};
 use serde_with::serde_as;
 
-use crate::args::{CONFIG_APP_NAME, DEFAULT_PRTL_TAG};
+use crate::args::{DEFAULT_PRTL_TAG};
+
+const CONFIG_APP_NAME: &str = ".prtl";
+
+pub const PRTL_SHORTHAND_SCRIPT: &str = r#"
+function p() {
+   if [ $1 = "get" ]; then 
+     cd $(prtl "$@")
+   elif [ $1 = "set" ]; then
+     $(prtl $@)
+   else
+     echo Global options will not work. Type \'prtl -h\' for more info.
+     echo \'p\' short-hand only supports \'get\' and \'set\' commands. 
+   fi
+}
+"#;
 
 /// prtl config stores the default_prtl tag as well as all the custom tags
 #[serde_as]
