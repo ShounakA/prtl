@@ -1,6 +1,6 @@
 [package]
 name = "prtl"
-version = "0.2.1-alpha"
+version = "0.3.0-alpha"
 license = "MIT"
 description = "Jump to tagged directories quickly with prtl."
 edition = "2021"
@@ -10,6 +10,7 @@ edition = "2021"
 [dependencies]
 clap = { version = "4.1.4", features = ["derive"] }
 confy = { version = "0.5.1", features = ["yaml_conf"], default-features=false } 
+dirs = "5.0"
 serde = "1.0.152"
 serde_json = "1.0.95"
 serde_derive = "1.0.152"

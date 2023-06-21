@@ -10,17 +10,30 @@ use crate::args::{DEFAULT_PRTL_TAG};
 
 const CONFIG_APP_NAME: &str = ".prtl";
 
-pub const PRTL_SHORTHAND_SCRIPT: &str = r#"
+pub const PRTL_SHORTHAND_SCRIPT_BASH: &str = r#"
 function p() {
    if [ $1 = "get" ]; then 
      cd $(prtl "$@")
    elif [ $1 = "set" ]; then
-     $(prtl $@)
+     $(prtl "$@")
    else
      echo Global options will not work. Type \'prtl -h\' for more info.
      echo \'p\' short-hand only supports \'get\' and \'set\' commands. 
    fi
 }
+"#;
+
+pub const PRTL_SHORTHAND_SCRIPT_FISH: &str = r#"
+function p
+   if [ $argv[1] = "get" ]
+     cd (eval prtl "$argv[1..-1]")
+   else if [ $argv[1] = "set" ]
+     eval prtl "$argv[1..-1]"
+   else
+     echo Global options will not work. Type \'prtl -h\' for more info.
+     echo \'p\' short-hand only supports \'get\' and \'set\' commands. 
+   end
+end
 "#;
 
 /// prtl config stores the default_prtl tag as well as all the custom tags

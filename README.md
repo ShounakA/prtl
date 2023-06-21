@@ -10,6 +10,7 @@ Small tool to keep track of your tagged directories. Portal to tagged locations 
 
 ## Auto Configure Shorthand
 ```prtl ez-init --shell bash```
+```prtl ez-init --shell fish```
 ## Manually Configure Shorthand
 
 ### Bash
@@ -29,6 +30,20 @@ Small tool to keep track of your tagged directories. Portal to tagged locations 
 2. Update your .bashrc | .bash_profile | .profile to include:
 ``` source path/to/your/newly/created/script/file.sh ```
 
+### Fish 
+1. Add file p.fish to `~/.config/fish/functions` with:
+   ```fish
+   function p
+      if [ $argv[1] = "get" ]
+         cd (eval prtl "$argv[1..-1]")
+      else if [ $argv[1] = "set" ]
+         eval prtl "$argv[1..-1]"
+      else
+         echo Global options will not work. Type \'prtl -h\' for more info.
+         echo \'p\' short-hand only supports \'get\' and \'set\' commands. 
+      end
+   end
+   ```
 ## Usage
 
 - ```prtl -h``` -> Help command

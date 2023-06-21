@@ -2,6 +2,7 @@ use clap::{arg, Parser, Subcommand};
 
 pub const DEFAULT_PRTL_TAG: &str = "default_prtl";
 pub const SHELL_TAG_BASH: &str = "bash";
+pub const SHELL_TAG_FISH: &str = "fish";
 
 /// prtl arguments
 /// Usage: prtl <COMMAND>

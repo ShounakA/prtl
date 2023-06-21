@@ -12,9 +12,10 @@ use std::fs::{File, OpenOptions};
 use std::io::Error;
 use std::io::Write as IoWrite;
 use std::path::PathBuf;
+extern crate dirs;
 
-use args::{Commands, PortalArgs, SHELL_TAG_BASH};
-use portal::{Config, Error as PrtlError, PRTL_SHORTHAND_SCRIPT};
+use args::{Commands, PortalArgs, SHELL_TAG_BASH, SHELL_TAG_FISH};
+use portal::{Config, Error as PrtlError, PRTL_SHORTHAND_SCRIPT_BASH, PRTL_SHORTHAND_SCRIPT_FISH};
 
 
 /// Usage: prtl <COMMAND>
@@ -52,16 +53,22 @@ fn main() -> Result<(), PrtlError> {
                 )));
             }
         }
-        Commands::EzInit { shell } => match shell.as_str() {
-            SHELL_TAG_BASH => {
-                return setup_bash();
+        Commands::EzInit { shell } => {
+            match shell.as_str() {
+                SHELL_TAG_BASH => {
+                    writeln!(&mut stdout, "Function for {} shell has been added. Reset your terminal then try 'p get'", shell).ok();
+                    return setup_bash();
+                }
+                SHELL_TAG_FISH => {
+                    return setup_fish();   
+                }
+                _ => {
+                    writeln!(
+                        stdout,
+                        "Usupported shell. Please try and configure manually."
+                    )
+                    .expect("Could not write to terminal. ¯\\_(ツ)_/¯");
             }
-            _ => {
-                writeln!(
-                    stdout,
-                    "Usupported shell. Please try and configure manually."
-                )
-                .expect("Could not write to terminal. ¯\\_(ツ)_/¯");
             }
         },
         Commands::List { json } => {
@@ -165,7 +172,7 @@ fn setup_bash() -> Result<(), PrtlError> {
     path.push("prtl_shorthand.sh");
 
     let shorthand_path = path.to_string_lossy().to_string();
-    match write_shorthand_file(&shorthand_path) {
+    match write_shorthand_file(&shorthand_path, "bash") {
         Ok(_) => (),
         Err(_e) => return Err(PrtlError::new(format!(""))),
     };
@@ -173,6 +180,69 @@ fn setup_bash() -> Result<(), PrtlError> {
       Ok(_) => Ok(()),
       Err(_e) => Err(PrtlError::new(format!("Failed to write to file. Try manual configuration: https://github.com/ShounakA/prtl#readme")))
    };
+}
+
+fn setup_fish() -> Result<(), PrtlError> {
+ let mut search: Vec<String> = Vec::new();
+
+    //Add custom option if the file was not found in search.
+    let default: String = "Custom".to_string();
+    search.push("Default".to_string());
+    search.push(default);
+
+    // Show selections in terminal
+    let selection = Select::with_theme(&ColorfulTheme::default())
+        .items(&search)
+        .default(0)
+        .interact_on_opt(&Term::stderr())
+        .expect("Should've selected 'Custom' ¯\\_(ツ)_/¯");
+
+    let selected_option = match selection {
+        Some(index) => &search[index],
+        None => &search[0],
+    };
+    // write the script file here
+    let file_to_write = match selected_option.as_str() {
+        "Custom" => {
+            let custom_file = match Input::<String>::new()
+                .with_prompt("Enter the file path to your bash profile")
+                .interact_text()
+            {
+                Ok(typed_text) => typed_text,
+                Err(_) => {
+                    return Err(PrtlError::new(format!(
+                        "¯\\_(ツ)_/¯ Something went wrong with input"
+                    )))
+                }
+            };
+            let canonical_dir = match fs::canonicalize(&custom_file) {
+                Ok(path) => path.to_string_lossy().to_string(),
+                Err(_e) => {
+                    return Err(PrtlError::new(format!(
+                        "Path {} is invalid.",
+                        custom_file
+                    )));
+                }
+            };
+            canonical_dir
+        }
+        _ => {
+            let mut fish_function_dir = dirs::home_dir().expect("$HOME folders should exist.");
+            fish_function_dir.push(".config");
+            fish_function_dir.push("fish");
+            fish_function_dir.push("functions");
+            fish_function_dir.to_string_lossy().to_string()
+        }
+    };
+    
+    let mut path = PathBuf::from(&file_to_write);
+    path.push("p.fish");
+    let shorthand_path = path.to_string_lossy().to_string();
+    match write_shorthand_file(&shorthand_path, "fish") {
+        Ok(_) => (),
+        Err(_e) => return Err(PrtlError::new(format!("Cannot create p.fish function"))),
+    };
+    return Ok(())
 }
 
 fn write_to_profile(selected_option: &String, shorthand_path: String) -> Result<(), Error> {
@@ -188,7 +258,18 @@ fn write_to_profile(selected_option: &String, shorthand_path: String) -> Result<
     }
 }
 
-fn write_shorthand_file(shorthand_path: &String) -> Result<(), Error> {
-    let mut file = File::create(shorthand_path)?;
-    write!(file, "{}", PRTL_SHORTHAND_SCRIPT)
+fn write_shorthand_file(shorthand_path: &String, tag: &str) -> Result<(), PrtlError> {
+    let mut file = File::create(shorthand_path).unwrap();
+    match tag {
+        "bash" => {
+            write!(file, "{}", PRTL_SHORTHAND_SCRIPT_BASH).ok();
+            Ok(())
+        }
+        "fish" => {
+            write!(file, "{}", PRTL_SHORTHAND_SCRIPT_FISH).ok();
+            Ok(())        }
+        _ => {
+            Err(PrtlError::new(format!("Unknown shell tag.")))
+        }
+    }
 }
